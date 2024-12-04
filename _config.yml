@@ -1,17 +1,20 @@
-title: Nighthawk Pages 
+title: Anishka's Pages
 description: "Class of 2025"
 owner_name: Anishka Sanghvi
 github_username: SpaceGirl13
-github_repo: "Anishka_2025" 
+github_repo: "Anishka_2025"
 baseurl: "/Anishka_2025"
 future: true
 remote_theme: jekyll/minima
 minima:
   skin: dark
   social_links:
-    - { platform: github, user_url: "https://github.com/SpaceGirl13"}
+    - { platform: github, user_url: "https://github.com/SpaceGirl13" }
     - { platform: x, user_url: "https://x.com/NighthawkCoding/" }
-    - { platform: youtube, user_url: "https://www.youtube.com/@nighthawkcodingsociety2868" } 
+    - {
+        platform: youtube,
+        user_url: "https://www.youtube.com/@nighthawkcodingsociety2868",
+      }
 # remote_theme: pages-themes/midnight@v0.2.0
 # remote_theme: pages-themes/cayman@v0.2.0
 # remote_theme: pages-themes/dinky@v0.2.0
