@@ -39,4 +39,4 @@ permalink: /about/
 <button><a href="https://app.slack.com/client/T05N4AYDXAM/C0815FEKP0V" style="color:purple;">Slack</a></button>
 <button><a href="https://github.com/dashboard" style="color:blue;">Github</a></button>
 <button><a href="https://nighthawkcoders.github.io/portfolio_2025/navigation/section/csse" style="color:green;">Nighthawk Pages</a></button>
-<button><a href="https://github.com/SpaceGirl13/portfolio_2025_Anishka" style="color:orange;">Nighthawk Pages</a></button>
+<button><a href="https://github.com/SpaceGirl13/portfolio_2025_Anishka" style="color:orange;">Github Notebook</a></button>
