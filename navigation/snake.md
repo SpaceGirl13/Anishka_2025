@@ -215,6 +215,25 @@ permalink: /snake/
         /* Snake is on the Go (Driver Function)  */
         /////////////////////////////////////////////////////////////
         let mainLoop = function(){
+        // Clear the canvas
+        ctx.beginPath();
+        ctx.fillStyle = "royalblue";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw the grid
+        ctx.strokeStyle = "black"; // Grid line color
+        for (let x = 0; x < canvas.width; x += BLOCK) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, canvas.height);
+            ctx.stroke();
+        }
+        for (let y = 0; y < canvas.height; y += BLOCK) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
+        }
             let _x = snake[0].x;
             let _y = snake[0].y;
             snake_dir = snake_next_dir;   // read async event key
