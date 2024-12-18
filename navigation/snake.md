@@ -3,8 +3,7 @@ layout: base
 title: Snake
 permalink: /snake/
 ---
-<!DOCTYPE html>
-<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,7 +17,6 @@ permalink: /snake/
             color: #fff;
             text-align: center; /* Center all content */
         }
-
         /* Canvas styling */
         canvas {
             display: none;
@@ -27,13 +25,11 @@ permalink: /snake/
             margin: 20px auto; /* Center the canvas horizontally */
             display: block;
         }
-
         /* General screens styling */
         #menu, #gameover, #setting {
             text-align: center;
             margin-top: 50px;
         }
-
         a {
             font-size: 24px;
             text-decoration: none;
@@ -41,29 +37,24 @@ permalink: /snake/
             margin: 10px;
             cursor: pointer;
         }
-
         a:hover::before {
             content: ">";
             margin-right: 10px;
         }
-
         /* Settings buttons */
         input[type="radio"] {
             display: none;
         }
-
         label {
             cursor: pointer;
             padding: 5px 10px;
             border: 1px solid #fff;
             margin: 0 5px;
         }
-
         input[type="radio"]:checked + label {
             background-color: #FFFFFF;
             color: #000;
         }
-
         /* Footer styling */
         footer {
             margin-top: 50px;
@@ -71,12 +62,12 @@ permalink: /snake/
             color: #fff;
             text-align: center;
         }
-
         footer a {
             color: #fff;
             text-decoration: underline;
         }
     </style>
+
 </head>
 <body>
     <h2>Snake</h2>
@@ -121,7 +112,6 @@ permalink: /snake/
             </div>
         </div>
     </div>
-
     <script>
         (function () {
             /* Game Variables */
@@ -132,16 +122,23 @@ permalink: /snake/
             let snake = [];
             let snake_dir, snake_next_dir;
             let snake_speed = 120;
-            let food = { x: 0, y: 0 };
+            let food = {
+                x: 0,
+                y: 0,
+                image: new Image(),
+                width: 512, // Set the width in pixels
+                height: 512 // Set the height in pixels
+            };
+            food.image.src = "https://github.com/user-attachments/assets/c33eb630-528a-44a9-a050-548df5d06ac2"; // Replace with your image URL
+            food.image.onload = () => console.log("Food image loaded successfully.");
+            food.image.onerror = () => console.error("Error: Failed to load food image.");
             let score = 0;
-
             /* Screen Constants */
             const SCREEN_MENU = -1, SCREEN_GAME_OVER = 1, SCREEN_SNAKE = 0, SCREEN_SETTING = 2;
             const screen_menu = document.getElementById("menu");
             const screen_game_over = document.getElementById("gameover");
             const screen_setting = document.getElementById("setting");
             const ele_score = document.getElementById("score_value");
-
             /* Utility Functions */
             const showScreen = (screen) => {
                 SCREEN = screen;
@@ -150,24 +147,24 @@ permalink: /snake/
                 screen_setting.style.display = screen === SCREEN_SETTING ? "block" : "none";
                 canvas.style.display = screen === SCREEN_SNAKE ? "block" : "none";
             };
-
             const addFood = () => {
                 food.x = Math.floor(Math.random() * (canvas.width / BLOCK));
                 food.y = Math.floor(Math.random() * (canvas.height / BLOCK));
             };
-
-            const activeDot = (x, y) => {
-                ctx.fillStyle = "#FFFFFF";
-                ctx.fillRect(x * BLOCK, y * BLOCK, BLOCK, BLOCK);
+            // Update activeDot to use emoji for snake
+            const activeDot = (x, y, emoji) => {
+                const snakeemoji = "🐍"; // Snake emoji
+                const foodemoji = "🍎"
+                ctx.font = `${BLOCK}px Arial`; // Set font size to match BLOCK size
+                ctx.textAlign = "center"; // Center the emoji in the block
+                ctx.textBaseline = "middle"; // Center the emoji vertically
+                ctx.fillText(emoji, x * BLOCK + BLOCK / 2, y * BLOCK + BLOCK / 2); // Draw the emoji
             };
-
             const gameOver = () => {
                 showScreen(SCREEN_GAME_OVER);
             };
-
             const mainLoop = () => {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-
                 // Draw grid
                 ctx.strokeStyle = "#444";
                 for (let x = 0; x < canvas.width; x += BLOCK) {
@@ -182,7 +179,6 @@ permalink: /snake/
                     ctx.lineTo(canvas.width, y);
                     ctx.stroke();
                 }
-
                 // Move the snake
                 let head = { ...snake[0] };
                 if (snake_next_dir !== undefined) snake_dir = snake_next_dir;
@@ -190,25 +186,20 @@ permalink: /snake/
                 if (snake_dir === 1) head.x++;
                 if (snake_dir === 2) head.y++;
                 if (snake_dir === 3) head.x--;
-
                 // Check for collisions
                 if (head.x < 0 || head.y < 0 || head.x >= canvas.width / BLOCK || head.y >= canvas.height / BLOCK)
                     return gameOver();
-
                 snake.unshift(head);
                 if (head.x === food.x && head.y === food.y) {
                     score++;
                     ele_score.innerText = score;
                     addFood();
                 } else snake.pop();
-
                 // Draw snake and food
-                activeDot(food.x, food.y);
-                snake.forEach(part => activeDot(part.x, part.y));
-
+                activeDot(food.x, food.y, "🍎");
+                snake.forEach(part => activeDot(part.x, part.y,"🐍"));
                 setTimeout(mainLoop, snake_speed);
             };
-
             const newGame = () => {
                 showScreen(SCREEN_SNAKE);
                 score = 0;
@@ -218,23 +209,20 @@ permalink: /snake/
                 addFood();
                 mainLoop();
             };
-
             /* Event Listeners */
             window.addEventListener("keydown", (e) => {
+                e.preventDefault();
                 if (e.code === "Space" && SCREEN !== SCREEN_SNAKE) newGame();
                 if (e.code === "ArrowUp" && snake_dir !== 2) snake_next_dir = 0;
                 if (e.code === "ArrowRight" && snake_dir !== 3) snake_next_dir = 1;
                 if (e.code === "ArrowDown" && snake_dir !== 0) snake_next_dir = 2;
                 if (e.code === "ArrowLeft" && snake_dir !== 1) snake_next_dir = 3;
             });
-
             document.getElementById("new_game").onclick = newGame;
             document.getElementById("new_game1").onclick = newGame;
-
             // Settings menu toggle
             document.getElementById("setting_menu").onclick = () => showScreen(SCREEN_SETTING);
             document.getElementById("setting_menu1").onclick = () => showScreen(SCREEN_SETTING);
-
             // Apply settings
             document.getElementById("speed1").onclick = () => snake_speed = 120;
             document.getElementById("speed2").onclick = () => snake_speed = 75;
@@ -243,5 +231,5 @@ permalink: /snake/
             document.getElementById("walloff").onclick = () => wall_on = false;
         })();
     </script>
+
 </body>
-</html>
