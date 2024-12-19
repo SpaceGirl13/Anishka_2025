@@ -87,9 +87,10 @@ permalink: /snake/
                 <p>Game Over, press <span style="background-color: #FFFFFF; color: #000000">space</span> to try again</p>
                 <a id="new_game1" class="link-alert">new game</a>
                 <a id="setting_menu1" class="link-alert">settings</a>
+                <p>High Score: <span id="high_score_value">0</span></p>
             </div>
             <!-- Play Screen -->
-            <canvas id="snake" class="wrap" width="320" height="320" tabindex="1"></canvas>
+            <canvas id="snake" class="wrap" width="640" height="640" tabindex="1"></canvas>
             <!-- Settings Screen -->
             <div id="setting" class="py-4 text-light" style="display:none;">
                 <p>Settings Screen, press <span style="background-color: #FFFFFF; color: #000000">space</span> to go back to playing</p>
@@ -109,6 +110,14 @@ permalink: /snake/
                     <input id="walloff" type="radio" name="wall" value="0"/>
                     <label for="walloff">Off</label>
                 </p>
+                <p>Block Size:
+                    <input id="block_small" type="radio" name="blocksize" value="10" checked />
+                    <label for="block_small">Small</label>
+                    <input id="block_medium" type="radio" name="blocksize" value="20" />
+                    <label for="block_medium">Medium</label>
+                    <input id="block_large" type="radio" name="blocksize" value="30" />
+                    <label for="block_large">Large</label>
+                </p>
             </div>
         </div>
     </div>
@@ -117,7 +126,7 @@ permalink: /snake/
             /* Game Variables */
             const canvas = document.getElementById("snake");
             const ctx = canvas.getContext("2d");
-            const BLOCK = 10;
+            let BLOCK = 10;
             let SCREEN;
             let snake = [];
             let snake_dir, snake_next_dir;
@@ -133,12 +142,14 @@ permalink: /snake/
             food.image.onload = () => console.log("Food image loaded successfully.");
             food.image.onerror = () => console.error("Error: Failed to load food image.");
             let score = 0;
+            let highScore = localStorage.getItem("highScore") || 0;
             /* Screen Constants */
             const SCREEN_MENU = -1, SCREEN_GAME_OVER = 1, SCREEN_SNAKE = 0, SCREEN_SETTING = 2;
             const screen_menu = document.getElementById("menu");
             const screen_game_over = document.getElementById("gameover");
             const screen_setting = document.getElementById("setting");
             const ele_score = document.getElementById("score_value");
+            const ele_high_score = document.getElementById("high_score_value"); // Element to display high score
             /* Utility Functions */
             const showScreen = (screen) => {
                 SCREEN = screen;
@@ -148,21 +159,36 @@ permalink: /snake/
                 canvas.style.display = screen === SCREEN_SNAKE ? "block" : "none";
             };
             const addFood = () => {
-                food.x = Math.floor(Math.random() * (canvas.width / BLOCK));
-                food.y = Math.floor(Math.random() * (canvas.height / BLOCK));
+                const fruitEmojis = ["🍎", "🍌", "🍉", "🍇", "🍒", "🍓", "🍍", "🥭"];
+                food.x = Math.floor(Math.random() * (canvas.width / BLOCK)) * BLOCK / BLOCK;
+                food.y = Math.floor(Math.random() * (canvas.height / BLOCK)) * BLOCK / BLOCK;
+                foodemoji = fruitEmojis[Math.floor(Math.random() * fruitEmojis.length)];
             };
             // Update activeDot to use emoji for snake
             const activeDot = (x, y, emoji) => {
-                const snakeemoji = "🐍"; // Snake emoji
-                const foodemoji = "🍎"
                 ctx.font = `${BLOCK}px Arial`; // Set font size to match BLOCK size
                 ctx.textAlign = "center"; // Center the emoji in the block
                 ctx.textBaseline = "middle"; // Center the emoji vertically
                 ctx.fillText(emoji, x * BLOCK + BLOCK / 2, y * BLOCK + BLOCK / 2); // Draw the emoji
             };
             const gameOver = () => {
+                // Update high score if the current score is higher than the stored high score
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem("highScore", highScore);  // Store the new high score in localStorage
+                }
                 showScreen(SCREEN_GAME_OVER);
             };
+            // Add the applyBlockSize function here
+            const applyBlockSize = (newSize) => {
+                BLOCK = newSize;
+                canvas.width = 640
+                canvas.height = 640
+                addFood();
+                clearTimeout(gameLoop);
+                newGame(); // Restart the game with the new block size
+            };
+            let gameLoop;
             const mainLoop = () => {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 // Draw grid
@@ -196,16 +222,17 @@ permalink: /snake/
                     addFood();
                 } else snake.pop();
                 // Draw snake and food
-                activeDot(food.x, food.y, "🍎");
+                activeDot(food.x, food.y, foodemoji);
                 snake.forEach(part => activeDot(part.x, part.y,"🐍"));
-                setTimeout(mainLoop, snake_speed);
+                gameLoop = setTimeout(mainLoop, snake_speed);
             };
             const newGame = () => {
                 showScreen(SCREEN_SNAKE);
                 score = 0;
                 ele_score.innerText = score;
-                snake = [{ x: 5, y: 5 }];
+                snake = [{ x: Math.floor(canvas.width / (2 * BLOCK)), y: Math.floor(canvas.height / (2 * BLOCK)) }];
                 snake_dir = 1;
+                snake_next_dir = undefined;
                 addFood();
                 mainLoop();
             };
@@ -229,7 +256,12 @@ permalink: /snake/
             document.getElementById("speed3").onclick = () => snake_speed = 35;
             document.getElementById("wallon").onclick = () => wall_on = true;
             document.getElementById("walloff").onclick = () => wall_on = false;
+            document.getElementById("block_small").onclick = () => applyBlockSize(10);
+            document.getElementById("block_medium").onclick = () => applyBlockSize(20);
+            document.getElementById("block_large").onclick = () => applyBlockSize(30);
+            ele_high_score.innerText = highScore;
         })();
+        
     </script>
 
 </body>
