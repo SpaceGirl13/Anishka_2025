@@ -50,6 +50,9 @@ permalink: /snake/
             padding: 5px 10px;
             border: 1px solid #fff;
             margin: 0 5px;
+            display: inline-block;
+            background-color: transparent;
+            color: #fff;
         }
         input[type="radio"]:checked + label {
             background-color: #FFFFFF;
@@ -90,7 +93,7 @@ permalink: /snake/
                 <p>High Score: <span id="high_score_value">0</span></p>
             </div>
             <!-- Play Screen -->
-            <canvas id="snake" class="wrap" width="640" height="640" tabindex="1"></canvas>
+            <canvas id="snake" class="wrap" width = "320" height="320" tabindex="1"></canvas>
             <!-- Settings Screen -->
             <div id="setting" class="py-4 text-light" style="display:none;">
                 <p>Settings Screen, press <span style="background-color: #FFFFFF; color: #000000">space</span> to go back to playing</p>
@@ -138,9 +141,6 @@ permalink: /snake/
                 width: 512, // Set the width in pixels
                 height: 512 // Set the height in pixels
             };
-            food.image.src = "https://github.com/user-attachments/assets/c33eb630-528a-44a9-a050-548df5d06ac2"; // Replace with your image URL
-            food.image.onload = () => console.log("Food image loaded successfully.");
-            food.image.onerror = () => console.error("Error: Failed to load food image.");
             let score = 0;
             let highScore = localStorage.getItem("highScore") || 0;
             /* Screen Constants */
@@ -182,8 +182,8 @@ permalink: /snake/
             // Add the applyBlockSize function here
             const applyBlockSize = (newSize) => {
                 BLOCK = newSize;
-                canvas.width = 640
-                canvas.height = 640
+                canvas.width = 320
+                canvas.height = 320
                 addFood();
                 clearTimeout(gameLoop);
                 newGame(); // Restart the game with the new block size
@@ -216,6 +216,25 @@ permalink: /snake/
                 if (head.x < 0 || head.y < 0 || head.x >= canvas.width / BLOCK || head.y >= canvas.height / BLOCK)
                     return gameOver();
                 snake.unshift(head);
+                // Check for collisions
+                if (wall_on) {
+                    // Snake hits the wall
+                    if (head.x < 0 || head.y < 0 || head.x >= canvas.width / BLOCK || head.y >= canvas.height / BLOCK) {
+                        return gameOver();
+                    }
+                } else {
+                    // Snake wraps around when wall is off
+                    if (head.x < 0) head.x = canvas.width / BLOCK - 1;
+                    if (head.y < 0) head.y = canvas.height / BLOCK - 1;
+                    if (head.x >= canvas.width / BLOCK) head.x = 0;
+                    if (head.y >= canvas.height / BLOCK) head.y = 0;
+                }
+                // Check for self-collision
+                for (let i = 1; i < snake.length; i++) {
+                    if (snake[i].x === head.x && snake[i].y === head.y) {
+                        return gameOver(); // End game if snake collides with itself
+                    }
+                }
                 if (head.x === food.x && head.y === food.y) {
                     score++;
                     ele_score.innerText = score;
@@ -254,14 +273,23 @@ permalink: /snake/
             document.getElementById("speed1").onclick = () => snake_speed = 120;
             document.getElementById("speed2").onclick = () => snake_speed = 75;
             document.getElementById("speed3").onclick = () => snake_speed = 35;
+            let wall_on = true
             document.getElementById("wallon").onclick = () => wall_on = true;
             document.getElementById("walloff").onclick = () => wall_on = false;
             document.getElementById("block_small").onclick = () => applyBlockSize(10);
             document.getElementById("block_medium").onclick = () => applyBlockSize(20);
             document.getElementById("block_large").onclick = () => applyBlockSize(30);
+            document.getElementById("wallon").addEventListener("click", () => {
+            wall_on = true;
+                console.log("Wall is ON");
+            });
+            document.getElementById("walloff").addEventListener("click", () => {
+                wall_on = false;
+                console.log("Wall is OFF");
+            });
             ele_high_score.innerText = highScore;
         })();
-        
+
     </script>
 
 </body>
